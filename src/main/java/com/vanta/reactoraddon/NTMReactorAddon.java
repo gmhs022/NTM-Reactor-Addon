@@ -10,13 +10,17 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = NTMReactorAddon.MODID, version = Tags.VERSION, name = "NTMReactorAddon", acceptedMinecraftVersions = "[1.7.10]")
+@Mod(
+    modid = NTMReactorAddon.MODID,
+    version = Tags.VERSION,
+    name = "NTMReactorAddon",
+    acceptedMinecraftVersions = "[1.7.10]")
 public class NTMReactorAddon {
 
     public static final String MODID = "reactoraddon";
     public static final Logger LOG = LogManager.getLogger(MODID);
 
-    @SidedProxy(clientSide = "com.myname.mymodid.ClientProxy", serverSide = "com.myname.mymodid.CommonProxy")
+    @SidedProxy(clientSide = "com.vanta.reactoraddon.ClientProxy", serverSide = "com.vanta.reactoraddon.CommonProxy")
     public static CommonProxy proxy;
 
     @Mod.EventHandler
