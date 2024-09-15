@@ -1,4 +1,4 @@
-package com.vanta.reactoraddon;
+package com.vanta.reactoraddon.main;
 
 import java.io.File;
 

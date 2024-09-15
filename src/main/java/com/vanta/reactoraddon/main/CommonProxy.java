@@ -1,5 +1,8 @@
-package com.vanta.reactoraddon;
+package com.vanta.reactoraddon.main;
 
+import com.vanta.reactoraddon.NTMReactorAddon;
+import com.vanta.reactoraddon.Tags;
+import com.vanta.reactoraddon.main.Config;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;

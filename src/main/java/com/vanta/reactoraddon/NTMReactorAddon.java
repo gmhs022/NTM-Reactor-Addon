@@ -1,5 +1,6 @@
 package com.vanta.reactoraddon;
 
+import com.vanta.reactoraddon.main.CommonProxy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,7 +21,7 @@ public class NTMReactorAddon {
     public static final String MODID = "reactoraddon";
     public static final Logger LOG = LogManager.getLogger(MODID);
 
-    @SidedProxy(clientSide = "com.vanta.reactoraddon.ClientProxy", serverSide = "com.vanta.reactoraddon.CommonProxy")
+    @SidedProxy(clientSide = "com.vanta.reactoraddon.main.ClientProxy", serverSide = "com.vanta.reactoraddon.main.CommonProxy")
     public static CommonProxy proxy;
 
     @Mod.EventHandler
