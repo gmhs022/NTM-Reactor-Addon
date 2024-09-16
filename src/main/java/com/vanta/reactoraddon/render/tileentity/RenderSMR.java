@@ -1,11 +1,14 @@
 package com.vanta.reactoraddon.render.tileentity;
 
-import com.vanta.reactoraddon.main.ResourceManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
 
+import com.vanta.reactoraddon.main.ResourceManager;
+
 public class RenderSMR extends TileEntitySpecialRenderer {
+
     @Override
     public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float f) {
         GL11.glPushMatrix();

@@ -1,23 +1,26 @@
 package com.vanta.reactoraddon.tileentity.machine;
 
-import api.hbm.fluid.IFluidStandardTransceiver;
-import api.hbm.tile.IInfoProviderEC;
-import com.hbm.interfaces.IControlReceiver;
-import com.hbm.inventory.fluid.Fluids;
-import com.hbm.inventory.fluid.tank.FluidTank;
-import com.hbm.tileentity.IGUIProvider;
-import com.hbm.tileentity.TileEntityMachineBase;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
-public class TileEntityReactorSMR extends TileEntityMachineBase implements IControlReceiver, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC {
+import com.hbm.interfaces.IControlReceiver;
+import com.hbm.inventory.fluid.Fluids;
+import com.hbm.inventory.fluid.tank.FluidTank;
+import com.hbm.tileentity.IGUIProvider;
+import com.hbm.tileentity.TileEntityMachineBase;
 
-    public int temp;    // degrees c
+import api.hbm.fluid.IFluidStandardTransceiver;
+import api.hbm.tile.IInfoProviderEC;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+public class TileEntityReactorSMR extends TileEntityMachineBase
+    implements IControlReceiver, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC {
+
+    public int temp; // degrees c
     public int pressure;// psi
     public double nFlux;// abstract
     public int control; // %
@@ -33,6 +36,7 @@ public class TileEntityReactorSMR extends TileEntityMachineBase implements ICont
     public int totalFuelReactivity;
 
     public FluidTank[] tanks;
+
     public TileEntityReactorSMR() {
         super(28);
         this.tanks = new FluidTank[2];
@@ -42,7 +46,7 @@ public class TileEntityReactorSMR extends TileEntityMachineBase implements ICont
     }
 
     private double getReactivity() {
-        return totalFuelReactivity-cRodCoef*((double) control /100);
+        return totalFuelReactivity - cRodCoef * ((double) control / 100);
     }
 
     @Override
@@ -67,12 +71,12 @@ public class TileEntityReactorSMR extends TileEntityMachineBase implements ICont
 
     @Override
     public FluidTank[] getSendingTanks() {
-        return new FluidTank[] {tanks[1]};
+        return new FluidTank[] { tanks[1] };
     }
 
     @Override
     public FluidTank[] getReceivingTanks() {
-        return new FluidTank[] {tanks[0]};
+        return new FluidTank[] { tanks[0] };
     }
 
     @Override
