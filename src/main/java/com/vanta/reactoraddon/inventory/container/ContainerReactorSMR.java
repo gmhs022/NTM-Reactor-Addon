@@ -4,13 +4,16 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 
 import com.hbm.inventory.SlotTakeOnly;
+import com.hbm.util.InventoryUtil;
 import com.vanta.reactoraddon.tileentity.machine.TileEntityReactorSMR;
 
 public class ContainerReactorSMR extends Container {
 
     private TileEntityReactorSMR smr;
+    protected int slotCount;
 
     public ContainerReactorSMR(InventoryPlayer invPlayer, TileEntityReactorSMR te) {
         smr = te;
@@ -31,6 +34,8 @@ public class ContainerReactorSMR extends Container {
             // fluid id
             this.addSlotToContainer(new Slot(te, n + 2, 124, 134));
 
+            slotCount = n + 3;
+
             // player
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 9; j++) {
@@ -43,6 +48,32 @@ public class ContainerReactorSMR extends Container {
             }
         }
 
+    }
+
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int slotId) {
+        ItemStack stackFinal = null;
+        Slot slot = (Slot) this.inventorySlots.get(slotId);
+        if (slot != null && slot.getHasStack()) {
+            ItemStack slotStack = slot.getStack();
+            stackFinal = slotStack.copy();
+            if (slotId < slotCount) {
+                if (!InventoryUtil
+                    .mergeItemStack(this.inventorySlots, slotStack, slotCount, this.inventorySlots.size(), true)) {
+                    return null;
+                }
+            } else if (!InventoryUtil.mergeItemStack(this.inventorySlots, slotStack, 0, slotCount, false)) {
+                return null;
+            }
+
+            if (slotStack.stackSize == 0) {
+                slot.putStack(null);
+            } else {
+                slot.onSlotChanged();
+            }
+            slot.onPickupFromSlot(player, slotStack);
+        }
+        return stackFinal;
     }
 
     @Override
