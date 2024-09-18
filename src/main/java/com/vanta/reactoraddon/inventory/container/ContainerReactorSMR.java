@@ -17,8 +17,8 @@ public class ContainerReactorSMR extends Container {
         { // main reactor slots
             int n = 0;
             for (int y = -3; y < 4; y++) {
-                int size = 7 - Math.max(Math.abs(y)*2 - 2, 0);
-                int startx = 44 - (size/2 - 1) * 18;
+                int size = 7 - Math.max(Math.abs(y) * 2 - 2, 0);
+                int startx = 44 - (size / 2 - 1) * 18;
                 for (int x = 0; x < size; x++) {
                     this.addSlotToContainer(new Slot(te, n, startx + x * 18, 8 + 18 * (y + 3)));
                     n++;

@@ -1,20 +1,21 @@
 package com.vanta.reactoraddon.main;
 
+import java.util.Map;
+
+import net.minecraft.tileentity.TileEntity;
+
 import com.hbm.handler.GUIHandler;
 import com.vanta.reactoraddon.NTMReactorAddon;
 import com.vanta.reactoraddon.Tags;
-
 import com.vanta.reactoraddon.blocks.ModBlocks;
 import com.vanta.reactoraddon.tileentity.TileMappings;
+
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import net.minecraft.tileentity.TileEntity;
-
-import java.util.Map;
 
 public class CommonProxy {
 
@@ -30,11 +31,9 @@ public class CommonProxy {
 
         TileMappings.writeMappings();
 
-        for(Map.Entry<Class<? extends TileEntity>, String[]> te : TileMappings.map.entrySet() ) {
-            if (te.getValue().length == 1)
-                GameRegistry.registerTileEntity(te.getKey(),te.getValue()[0]);
-            else
-                GameRegistry.registerTileEntityWithAlternatives(te.getKey(),te.getValue()[0],te.getValue());
+        for (Map.Entry<Class<? extends TileEntity>, String[]> te : TileMappings.map.entrySet()) {
+            if (te.getValue().length == 1) GameRegistry.registerTileEntity(te.getKey(), te.getValue()[0]);
+            else GameRegistry.registerTileEntityWithAlternatives(te.getKey(), te.getValue()[0], te.getValue());
         }
 
         NTMReactorAddon.LOG.info(Config.greeting);

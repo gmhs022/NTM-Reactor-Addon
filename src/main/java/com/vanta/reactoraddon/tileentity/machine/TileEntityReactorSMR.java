@@ -1,7 +1,5 @@
 package com.vanta.reactoraddon.tileentity.machine;
 
-import com.vanta.reactoraddon.inventory.container.ContainerReactorSMR;
-import com.vanta.reactoraddon.inventory.gui.GUIReactorSMR;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -13,6 +11,8 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
+import com.vanta.reactoraddon.inventory.container.ContainerReactorSMR;
+import com.vanta.reactoraddon.inventory.gui.GUIReactorSMR;
 
 import api.hbm.fluid.IFluidStandardTransceiver;
 import api.hbm.tile.IInfoProviderEC;
@@ -78,8 +78,6 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
         return "container.smr";
     }
 
-
-
     @Override
     public void updateEntity() {
         if (!worldObj.isRemote) {
@@ -97,13 +95,13 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
 
     @Override
     public Container provideContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        return new ContainerReactorSMR(player.inventory,this);
+        return new ContainerReactorSMR(player.inventory, this);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        return new GUIReactorSMR(player.inventory,this);
+        return new GUIReactorSMR(player.inventory, this);
     }
 
     @Override

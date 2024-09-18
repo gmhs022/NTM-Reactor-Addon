@@ -1,17 +1,17 @@
 package com.vanta.reactoraddon.blocks.machines;
 
-import com.hbm.main.MainRegistry;
-import com.vanta.reactoraddon.NTMReactorAddon;
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.tileentity.TileEntityProxyCombo;
+import com.vanta.reactoraddon.NTMReactorAddon;
 import com.vanta.reactoraddon.tileentity.machine.TileEntityReactorSMR;
-import net.minecraftforge.common.util.ForgeDirection;
+
+import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 
 public class ReactorSMR extends BlockDummyable {
 
@@ -37,14 +37,15 @@ public class ReactorSMR extends BlockDummyable {
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX,
+        float hitY, float hitZ) {
         if (world.isRemote) {
             return true;
         } else if (!player.isSneaking()) {
-            int[] core = this.findCore(world,x,y,z);
-            if (core!=null) {
+            int[] core = this.findCore(world, x, y, z);
+            if (core != null) {
                 // this better work, I don't want to have to copy over NTM's entire GUI handler just for a damn addon
-                FMLNetworkHandler.openGui(player, NTMReactorAddon.instance,0,world,core[0],core[1],core[2]);
+                FMLNetworkHandler.openGui(player, NTMReactorAddon.instance, 0, world, core[0], core[1], core[2]);
                 return true;
             } else return false;
         } else return true;
@@ -57,9 +58,9 @@ public class ReactorSMR extends BlockDummyable {
         x += dir.offsetX * o;
         z += dir.offsetZ * o;
 
-        this.makeExtra(world, x+1, y, z);
-        this.makeExtra(world, x-1, y, z);
-        this.makeExtra(world, x, y, z+1);
-        this.makeExtra(world, x, y, z-1);
+        this.makeExtra(world, x + 1, y, z);
+        this.makeExtra(world, x - 1, y, z);
+        this.makeExtra(world, x, y, z + 1);
+        this.makeExtra(world, x, y, z - 1);
     }
 }
