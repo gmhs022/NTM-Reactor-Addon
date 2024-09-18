@@ -1,5 +1,6 @@
 package com.vanta.reactoraddon.main;
 
+import com.hbm.handler.GUIHandler;
 import com.vanta.reactoraddon.NTMReactorAddon;
 import com.vanta.reactoraddon.Tags;
 
@@ -9,6 +10,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.tileentity.TileEntity;
 
@@ -22,6 +24,9 @@ public class CommonProxy {
         Config.synchronizeConfiguration(event.getSuggestedConfigurationFile());
 
         ModBlocks.preLoad();
+
+        // will this work?
+        NetworkRegistry.INSTANCE.registerGuiHandler(NTMReactorAddon.instance, new GUIHandler());
 
         TileMappings.writeMappings();
 

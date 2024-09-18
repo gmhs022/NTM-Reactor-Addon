@@ -23,7 +23,7 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
     implements IControlReceiver, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC {
 
     public float temp; // degrees c
-    public int pressure;// psi
+    public double pressure;// bar
     public double nFlux;// abstract
     public float control; // %
 
@@ -39,14 +39,14 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
     public int fuelCount;
     public int totalFuelReactivity;
 
-    public int meltTemp;
+    public static final int meltTemp = 1400;
 
-    public int burstPres;
+    public static final int burstPres = 200;
 
     public FluidTank[] tanks;
 
     public TileEntityReactorSMR() {
-        super(28);
+        super(40);
         this.tanks = new FluidTank[2];
         this.tanks[0] = new FluidTank(Fluids.COOLANT, 32_000);
         this.tanks[1] = new FluidTank(Fluids.COOLANT_HOT, 32_000);
@@ -82,13 +82,17 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
 
     @Override
     public void updateEntity() {
-        double k = getEMF();
-        if (k>0) {
-            reactivity = (k-1)/k;
-        }
+        if (!worldObj.isRemote) {
+            double k = getEMF();
+            if (k > 0) {
+                reactivity = (k - 1) / k;
+            }
 
-        this.markDirty();
-        this.networkPackNT(150);
+            checkFail();
+
+            this.markDirty();
+            this.networkPackNT(150);
+        }
     }
 
     @Override

@@ -16,19 +16,20 @@ public class ContainerReactorSMR extends Container {
         smr = te;
         { // main reactor slots
             int n = 0;
-            for (int y = -3; y < 5; y++) {
-                int size = 7 - Math.max(Math.abs(y) - 1, 0);
+            for (int y = -3; y < 4; y++) {
+                int size = 7 - Math.max(Math.abs(y)*2 - 2, 0);
+                int startx = 44 - (size/2 - 1) * 18;
                 for (int x = 0; x < size; x++) {
-                    int startx = 7 + (size - 3) * 18;
-                    this.addSlotToContainer(new Slot(te, n, startx + x * 18, 7 + 18 * (y + 3)));
+                    this.addSlotToContainer(new Slot(te, n, startx + x * 18, 8 + 18 * (y + 3)));
                     n++;
                 }
             }
+
             // fluid
-            this.addSlotToContainer(new Slot(te, n, 178, 115));
-            this.addSlotToContainer(new SlotTakeOnly(te, n + 1, 178, 133));
+            this.addSlotToContainer(new Slot(te, n, 179, 116));
+            this.addSlotToContainer(new SlotTakeOnly(te, n + 1, 179, 134));
             // fluid id
-            this.addSlotToContainer(new Slot(te, n + 2, 123, 133));
+            this.addSlotToContainer(new Slot(te, n + 2, 124, 134));
 
             // player
             for (int i = 0; i < 3; i++) {

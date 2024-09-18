@@ -50,8 +50,10 @@ public class GUIReactorSMR extends GuiInfoContainer {
     public void drawScreen(int x, int y, float interp) {
         super.drawScreen(x,y,interp);
 
+        this.drawCustomInfoStat(x,y,guiLeft+160,guiTop+25,18,17,x,y, "Temperature:", String.format(Locale.US,"%.2f °C",smr.temp));
+        this.drawCustomInfoStat(x,y,guiLeft+178,guiTop+25,18,17,x,y, "Pressure:", String.format(Locale.US,"%.2f Bar",smr.pressure));
+        this.drawCustomInfoStat(x,y,guiLeft+160,guiTop+58,18,17,x,y, "Thermal power:", String.format(Locale.US,"%,d TU/t",smr.thermalOutput));
         this.drawCustomInfoStat(x,y,guiLeft+178,guiTop+58,18,17,x,y, "Reactivity:", (int) (smr.reactivity * 1e5) + " PCM");
-        this.drawCustomInfoStat(x,y,guiLeft+178,guiTop+58,18,17,x,y, "Thermal power:", String.format(Locale.US,"%,d TU/t",smr.thermalOutput));
     }
 
     @Override
