@@ -1,5 +1,7 @@
 package com.vanta.reactoraddon.tileentity.machine;
 
+import com.vanta.reactoraddon.inventory.container.ContainerReactorSMR;
+import com.vanta.reactoraddon.inventory.gui.GUIReactorSMR;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -20,20 +22,26 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class TileEntityReactorSMR extends TileEntityMachineBase
     implements IControlReceiver, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC {
 
-    public int temp; // degrees c
+    public float temp; // degrees c
     public int pressure;// psi
     public double nFlux;// abstract
-    public int control; // %
+    public float control; // %
 
-    public float cRodCoef; // wooo coefficients!
-    public float voidCoef; // mostly affects boilables, generally negative but graphite increases
-    public float tempCoef;
-    public float presCoef;
-    public float deplCoef;
+    public double reactivity; // rho/p
+    public int thermalOutput; // TU/s
+
+    public double cRodCoef; // wooo coefficients!
+    public double voidCoef; // mostly affects boilables, generally negative but graphite increases
+    public double tempCoef;
+    public double presCoef;
 
     public int crCount;
     public int fuelCount;
     public int totalFuelReactivity;
+
+    public int meltTemp;
+
+    public int burstPres;
 
     public FluidTank[] tanks;
 
@@ -45,8 +53,24 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
 
     }
 
-    private double getReactivity() {
-        return totalFuelReactivity - cRodCoef * ((double) control / 100);
+    private double getEMF() { // effective multiplication factor, each step n = n * k
+        return this.totalFuelReactivity + this.cRodCoef * (this.control / 100) + this.tempCoef * (this.temp);
+    }
+
+    private void meltdown() {
+
+    }
+
+    private void rupture() {
+
+    }
+
+    private void checkFail() {
+        if (this.pressure > burstPres) {
+            meltdown();
+        } else if (this.temp > meltTemp) {
+            rupture();
+        }
     }
 
     @Override
@@ -54,9 +78,28 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
         return "container.smr";
     }
 
+
+
     @Override
     public void updateEntity() {
+        double k = getEMF();
+        if (k>0) {
+            reactivity = (k-1)/k;
+        }
 
+        this.markDirty();
+        this.networkPackNT(150);
+    }
+
+    @Override
+    public Container provideContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        return new ContainerReactorSMR(player.inventory,this);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        return new GUIReactorSMR(player.inventory,this);
     }
 
     @Override
@@ -87,16 +130,5 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
     @Override
     public void provideExtraInfo(NBTTagCompound data) {
 
-    }
-
-    @Override
-    public Container provideContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        return null;
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        return null;
     }
 }

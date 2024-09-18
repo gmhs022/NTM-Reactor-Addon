@@ -18,6 +18,8 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
     name = "NTMReactorAddon",
     acceptedMinecraftVersions = "[1.7.10]")
 public class NTMReactorAddon {
+    @Mod.Instance
+    public static NTMReactorAddon instance;
 
     public static final String MODID = "reactoraddon";
     public static final Logger LOG = LogManager.getLogger(MODID);
