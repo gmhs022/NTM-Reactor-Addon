@@ -22,15 +22,19 @@ public class ModItems {
             .setCreativeTab(MainRegistry.controlTab)
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_empty");
         smr_control_boron = new ItemCustomLore().setUnlocalizedName("smr_control_boron")
+            .setMaxStackSize(1)
             .setCreativeTab(MainRegistry.controlTab)
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_control_boron");
         smr_control_graphite = new ItemCustomLore().setUnlocalizedName("smr_control_graphite")
+            .setMaxStackSize(1)
             .setCreativeTab(MainRegistry.controlTab)
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_control_graphite");
         smr_graphite_insert = new ItemCustomLore().setUnlocalizedName("smr_graphite_insert")
+            .setMaxStackSize(1)
             .setCreativeTab(MainRegistry.controlTab)
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_graphite_insert");
         smr_chicken_soup = new ItemLoreFood(6, 0.6f, false).setUnlocalizedName("smr_chicken_soup")
+            .setMaxStackSize(1)
             .setCreativeTab(MainRegistry.controlTab)
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_chicken_soup_done");
         ItemSMRFuelRod.init();
