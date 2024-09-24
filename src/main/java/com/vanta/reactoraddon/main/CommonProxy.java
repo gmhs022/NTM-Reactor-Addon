@@ -8,6 +8,7 @@ import com.hbm.handler.GUIHandler;
 import com.vanta.reactoraddon.NTMReactorAddon;
 import com.vanta.reactoraddon.Tags;
 import com.vanta.reactoraddon.blocks.ModBlocks;
+import com.vanta.reactoraddon.items.ModItems;
 import com.vanta.reactoraddon.tileentity.TileMappings;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -24,7 +25,11 @@ public class CommonProxy {
     public void preInit(FMLPreInitializationEvent event) {
         Config.synchronizeConfiguration(event.getSuggestedConfigurationFile());
 
-        ModBlocks.preLoad();
+        ModBlocks.init();
+        ModBlocks.register();
+
+        ModItems.init();
+        ModItems.register();
 
         // will this work?
         NetworkRegistry.INSTANCE.registerGuiHandler(NTMReactorAddon.instance, new GUIHandler());

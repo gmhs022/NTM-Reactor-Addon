@@ -10,14 +10,9 @@ import cpw.mods.fml.common.registry.GameRegistry;
 
 public class ModBlocks {
 
-    public static void preLoad() {
-        init();
-        register();
-    }
-
     public static Block reactor_smr;
 
-    private static void init() {
+    public static void init() {
         reactor_smr = new ReactorSMR(Material.iron).setBlockName("machine_smr")
             .setHardness(5.0F)
             .setResistance(100.0F)
@@ -25,7 +20,7 @@ public class ModBlocks {
             .setBlockTextureName("hbm:block_steel");
     }
 
-    private static void register() {
+    public static void register() {
         GameRegistry.registerBlock(reactor_smr, reactor_smr.getUnlocalizedName());
     }
 

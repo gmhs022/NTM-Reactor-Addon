@@ -17,6 +17,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.toserver.NBTControlPacket;
 import com.hbm.render.util.GaugeUtil;
 import com.vanta.reactoraddon.inventory.container.ContainerReactorSMR;
 import com.vanta.reactoraddon.tileentity.machine.TileEntityReactorSMR;
@@ -82,12 +84,24 @@ public class GUIReactorSMR extends GuiInfoContainer {
                 this.rodField.setText(String.format(Locale.US, "%.2f", newLevel));
                 NBTTagCompound packet = new NBTTagCompound();
                 packet.setFloat("rods", newLevel);
-
+                PacketDispatcher.wrapper.sendToServer(new NBTControlPacket(packet, smr.xCoord, smr.yCoord, smr.zCoord));
                 mc.getSoundHandler()
                     .playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1F));
             }
         } else if (!this.rodField.textboxKeyTyped(typedChar, keyCode)) {
             super.keyTyped(typedChar, keyCode);
+        }
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int i) {
+        super.mouseClicked(mouseX, mouseY, i);
+        this.rodField.mouseClicked(mouseX, mouseY, i);
+
+        if (mouseX >= guiLeft + 117 && mouseX < guiLeft + 135 && mouseY >= guiTop + 99 && mouseY < guiTop + 117) {
+            // add locking crap here fuck
+            mc.getSoundHandler()
+                .playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1F));
         }
     }
 

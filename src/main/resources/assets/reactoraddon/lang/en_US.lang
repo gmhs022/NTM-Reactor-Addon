@@ -1,2 +1,12 @@
 container.smr=Small Modular Reactor
 tile.machine_smr.name=Small Modular Reactor
+item.smr_fuel_empty.name=Empty SMR Fuel Rod
+item.smr_fuel_ueu235.name=Natural Uranium SMR Fuel Rod
+item.smr_fuel_meu235.name=Reactor Grade Uranium SMR Fuel Rod
+item.smr_fuel_heu235.name=Weapons Grade Uranium SMR Fuel Rod
+item.smr_control_boron.name=SMR Control Rod
+item.smr_control_boron.desc=Lowers reactivity when inserted.
+item.smr_control_graphite.name=SMR Control Rod w/ Graphite Displacer
+item.smr_control_graphite.desc=Lowers reactivity and moderation when inserted, raises moderation when withdrawn.$Provides an extra boost to low-reactivity reactors.
+item.smr_graphite_insert.name=SMR Graphite Moderator Insert
+item.smr_graphite_insert.desc=Moderates the neutrons with graphite.$Far more effective than fluid-based moderators, but can create a positive void coefficient if used too much.

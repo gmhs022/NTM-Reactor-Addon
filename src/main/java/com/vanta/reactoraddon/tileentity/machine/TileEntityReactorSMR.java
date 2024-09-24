@@ -4,7 +4,9 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.fluid.Fluids;
@@ -12,6 +14,8 @@ import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
+import com.hbm.util.fauxpointtwelve.DirPos;
+import com.vanta.reactoraddon.NTMReactorAddon;
 import com.vanta.reactoraddon.inventory.container.ContainerReactorSMR;
 import com.vanta.reactoraddon.inventory.gui.GUIReactorSMR;
 
@@ -19,6 +23,7 @@ import api.hbm.fluid.IFluidStandardTransceiver;
 import api.hbm.tile.IInfoProviderEC;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
 
 public class TileEntityReactorSMR extends TileEntityMachineBase
     implements IControlReceiver, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC {
@@ -31,8 +36,9 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
     public double reactivity; // rho/p
     public int thermalOutput; // TU/s
 
-    public double cRodCoef; // wooo coefficients!
-    public double voidCoef; // mostly affects boilables, generally negative but graphite increases
+    public double cRodCoef; // wooo coefficients! all PCM per unit unless otherwise specified
+    public double voidCoef; // mostly affects boilables, generally negative but graphite increases | measured as effect
+                            // at 100% voiding
     public double tempCoef;
     public double presCoef;
 
@@ -53,10 +59,9 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
         this.tanks = new FluidTank[2];
         this.tanks[0] = new FluidTank(Fluids.COOLANT, 32_000);
         this.tanks[1] = new FluidTank(Fluids.COOLANT_HOT, 32_000);
-
     }
 
-    private double getEMF() { // effective multiplication factor, each step n = n * k
+    private double getReactivity() { // in pcm
         return this.totalFuelReactivity + this.cRodCoef * (this.control / 100) + this.tempCoef * (this.temp);
     }
 
@@ -84,15 +89,30 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
     @Override
     public void updateEntity() {
         if (!worldObj.isRemote) {
-            this.tanks[0].setType(this.getSizeInventory() - 1, slots);
-            handleTanks();
 
-            double k = getEMF();
-            if (k > 0) {
-                reactivity = (k - 1) / k;
+            for (DirPos pos : getConPos()) {
+                this.trySubscribe(tanks[0].getTankType(), worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
+            }
+
+            boolean transferred = this.tanks[0].setType(this.getSizeInventory() - 1, slots);
+            if (transferred) {
+                handleTanks();
+                NTMReactorAddon.LOG.info("Transferred PWR fluid type.");
+            }
+            tanks[0].loadTank(this.getSizeInventory() - 3, this.getSizeInventory() - 2, slots);
+
+            double r = getReactivity();
+            double rawK = 1 / (1 - r / 1e5);
+
+            if (rawK > 0) {
+
             }
 
             checkFail();
+
+            for (DirPos pos : getConPos()) {
+                this.sendFluid(tanks[1], worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
+            }
 
             this.markDirty();
             this.networkPackNT(150);
@@ -161,6 +181,30 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
     }
 
     @Override
+    public void serialize(ByteBuf buf) {
+        super.serialize(buf);
+        buf.writeFloat(control);
+        buf.writeFloat(temp);
+        buf.writeDouble(pressure);
+        buf.writeDouble(nFlux);
+        buf.writeInt(thermalOutput);
+        buf.writeDouble(reactivity);
+        for (int i = 0; i < 2; i++) tanks[i].serialize(buf);
+    }
+
+    @Override
+    public void deserialize(ByteBuf buf) {
+        super.deserialize(buf);
+        this.control = buf.readFloat();
+        this.temp = buf.readFloat();
+        this.pressure = buf.readDouble();
+        this.nFlux = buf.readDouble();
+        this.thermalOutput = buf.readInt();
+        this.reactivity = buf.readDouble();
+        for (int i = 0; i < 2; i++) tanks[i].deserialize(buf);
+    }
+
+    @Override
     public Container provideContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
         return new ContainerReactorSMR(player.inventory, this);
     }
@@ -182,6 +226,27 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
             this.control = data.getFloat("rods");
             this.markChanged();
         }
+    }
+
+    AxisAlignedBB bb = null;
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        if (bb == null) {
+            bb = AxisAlignedBB.getBoundingBox(xCoord - 1, yCoord, zCoord - 1, xCoord + 1, yCoord + 7, zCoord + 1);
+        }
+        return bb;
+    }
+
+    private DirPos[] getConPos() {
+        return new DirPos[] { new DirPos(xCoord - 2, yCoord, zCoord - 1, ForgeDirection.WEST),
+            new DirPos(xCoord - 2, yCoord, zCoord + 1, ForgeDirection.WEST),
+            new DirPos(xCoord - 1, yCoord, zCoord - 2, ForgeDirection.NORTH),
+            new DirPos(xCoord - 1, yCoord, zCoord + 2, ForgeDirection.NORTH),
+            new DirPos(xCoord + 2, yCoord, zCoord - 1, ForgeDirection.EAST),
+            new DirPos(xCoord + 2, yCoord, zCoord + 1, ForgeDirection.EAST),
+            new DirPos(xCoord - 1, yCoord, zCoord + 2, ForgeDirection.SOUTH),
+            new DirPos(xCoord - 1, yCoord, zCoord + 2, ForgeDirection.SOUTH), };
     }
 
     @Override
