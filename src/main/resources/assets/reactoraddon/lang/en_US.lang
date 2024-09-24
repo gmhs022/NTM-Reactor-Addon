@@ -10,3 +10,5 @@ item.smr_control_graphite.name=SMR Control Rod w/ Graphite Displacer
 item.smr_control_graphite.desc=Lowers reactivity and moderation when inserted, raises moderation when withdrawn.$Provides an extra boost to low-reactivity reactors.
 item.smr_graphite_insert.name=SMR Graphite Moderator Insert
 item.smr_graphite_insert.desc=Moderates the neutrons with graphite.$Far more effective than fluid-based moderators, but can create a positive void coefficient if used too much.
+item.smr_chicken_soup.name=Campbell's™ Condensed Chicken Noodle Soup
+item.smr_chicken_soup.desc=Now with extra zirconium cladding!

@@ -39,7 +39,14 @@ public class ItemSMRFuelRod extends Item {
 
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean bool) {
-        list.add(EnumChatFormatting.ITALIC + this.fullName);
+        if (stack.getItem() == undefined) { // COVER YOURSELF IN OIL
+            list.add(
+                EnumChatFormatting.ITALIC.toString() + EnumChatFormatting.RED
+                    + (player.worldObj.rand.nextInt(5) < 2 ? "java.lang.ArrayIndexOutOfBoundsException"
+                        : EnumChatFormatting.OBFUSCATED + "java.lang.ArrayIndexOutOfBoundsException"));
+        } else {
+            list.add(EnumChatFormatting.ITALIC + this.fullName);
+        }
         list.add(EnumChatFormatting.GREEN + "Depletion: " + Math.floor(depletion * 100) / 100 + "%");
         list.add(EnumChatFormatting.YELLOW + "Reactivity: " + Math.floor(this.trueReactivity * 100) / 100 + " PCM");
         list.add(EnumChatFormatting.YELLOW + "Temp Coefficient: " + Math.floor(this.tempCoef * -100) / 100 + " PCM/°C");
@@ -85,6 +92,8 @@ public class ItemSMRFuelRod extends Item {
     public static ItemSMRFuelRod meu235;
     public static ItemSMRFuelRod heu235;
 
+    public static ItemSMRFuelRod undefined;
+
     public static void init() {
         ueu235 = (ItemSMRFuelRod) new ItemSMRFuelRod("Unenriched Uranium", 50).setDepletionFactor(1.0)
             .setEmissionRate(1e-5)
@@ -101,11 +110,18 @@ public class ItemSMRFuelRod extends Item {
             .setYield(0.5D)
             .setUnlocalizedName("smr_fuel_heu235")
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_ueu235");
+        undefined = (ItemSMRFuelRod) new ItemSMRFuelRod("Undefined", 1000).setDepletionFactor(-3.0)
+            .setTempCoef(-2)
+            .setEmissionRate(1.0D)
+            .setYield(400.0D)
+            .setUnlocalizedName("smr_fuel_undefined")
+            .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_error");
     }
 
     public static void register() {
         GameRegistry.registerItem(ueu235, ueu235.getUnlocalizedName());
         GameRegistry.registerItem(meu235, meu235.getUnlocalizedName());
         GameRegistry.registerItem(heu235, heu235.getUnlocalizedName());
+        GameRegistry.registerItem(undefined, undefined.getUnlocalizedName());
     }
 }
