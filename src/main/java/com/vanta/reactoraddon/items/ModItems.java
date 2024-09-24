@@ -32,7 +32,7 @@ public class ModItems {
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_graphite_insert");
         smr_chicken_soup = new ItemLoreFood(6, 0.6f, false).setUnlocalizedName("smr_chicken_soup")
             .setCreativeTab(MainRegistry.controlTab)
-            .setTextureName(NTMReactorAddon.MODID + ":machine/smr_chicken_soup");
+            .setTextureName(NTMReactorAddon.MODID + ":machine/smr_chicken_soup_done");
         ItemSMRFuelRod.init();
     }
 

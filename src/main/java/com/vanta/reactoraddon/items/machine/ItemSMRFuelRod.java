@@ -94,6 +94,8 @@ public class ItemSMRFuelRod extends Item {
 
     public static ItemSMRFuelRod undefined;
 
+    public static ItemSMRFuelRod soup;
+
     public static void init() {
         ueu235 = (ItemSMRFuelRod) new ItemSMRFuelRod("Unenriched Uranium", 50).setDepletionFactor(1.0)
             .setEmissionRate(1e-5)
@@ -116,6 +118,12 @@ public class ItemSMRFuelRod extends Item {
             .setYield(400.0D)
             .setUnlocalizedName("smr_fuel_undefined")
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_error");
+        soup = (ItemSMRFuelRod) new ItemSMRFuelRod("Now with extra zirconium cladding!", -250).setDepletionFactor(0)
+            .setTempCoef(0)
+            .setYield(10)
+            .setIodineRate(0)
+            .setUnlocalizedName("smr_fuel_soup")
+            .setTextureName(NTMReactorAddon.MODID + ":machine/smr_chicken_soup");
     }
 
     public static void register() {
@@ -123,5 +131,6 @@ public class ItemSMRFuelRod extends Item {
         GameRegistry.registerItem(meu235, meu235.getUnlocalizedName());
         GameRegistry.registerItem(heu235, heu235.getUnlocalizedName());
         GameRegistry.registerItem(undefined, undefined.getUnlocalizedName());
+        GameRegistry.registerItem(soup, soup.getUnlocalizedName());
     }
 }
