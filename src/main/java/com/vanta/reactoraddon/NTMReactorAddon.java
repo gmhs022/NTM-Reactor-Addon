@@ -16,7 +16,8 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
     modid = NTMReactorAddon.MODID,
     version = Tags.VERSION,
     name = "NTMReactorAddon",
-    acceptedMinecraftVersions = "[1.7.10]")
+    acceptedMinecraftVersions = "[1.7.10]",
+    dependencies = "required-after:hbm")
 public class NTMReactorAddon {
 
     @Mod.Instance

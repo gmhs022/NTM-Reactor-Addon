@@ -1,5 +1,10 @@
 package com.vanta.reactoraddon.main;
 
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.item.Item;
+import net.minecraftforge.client.MinecraftForgeClient;
+
+import com.hbm.render.tileentity.IItemRendererProvider;
 import com.vanta.reactoraddon.render.tileentity.RenderSMR;
 import com.vanta.reactoraddon.tileentity.machine.TileEntityReactorSMR;
 
@@ -16,5 +21,18 @@ public class ClientProxy extends CommonProxy {
         super.preInit(event);
 
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityReactorSMR.class, new RenderSMR());
+
+        registerItemRenderer();
+    }
+
+    public void registerItemRenderer() {
+        for (Object renderer : TileEntityRendererDispatcher.instance.mapSpecialRenderers.values()) {
+            if (renderer instanceof IItemRendererProvider) {
+                IItemRendererProvider prov = (IItemRendererProvider) renderer;
+                for (Item item : prov.getItemsForRenderer()) {
+                    MinecraftForgeClient.registerItemRenderer(item, prov.getRenderer());
+                }
+            }
+        }
     }
 }

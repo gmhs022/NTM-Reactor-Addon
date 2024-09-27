@@ -8,6 +8,7 @@ import com.hbm.handler.GUIHandler;
 import com.vanta.reactoraddon.NTMReactorAddon;
 import com.vanta.reactoraddon.Tags;
 import com.vanta.reactoraddon.blocks.ModBlocks;
+import com.vanta.reactoraddon.inventory.fluid.TraitAdder;
 import com.vanta.reactoraddon.items.ModItems;
 import com.vanta.reactoraddon.tileentity.TileMappings;
 
@@ -18,7 +19,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-public class CommonProxy {
+public abstract class CommonProxy {
 
     // preInit "Run before anything else. Read your config, create blocks, items, etc, and register them with the
     // GameRegistry." (Remove if not needed)
@@ -41,6 +42,7 @@ public class CommonProxy {
             else GameRegistry.registerTileEntityWithAlternatives(te.getKey(), te.getValue()[0], te.getValue());
         }
 
+        TraitAdder.init();
         NTMReactorAddon.LOG.info(Config.greeting);
         NTMReactorAddon.LOG.info("NTM Reactor Addon loaded. Version " + Tags.VERSION);
     }

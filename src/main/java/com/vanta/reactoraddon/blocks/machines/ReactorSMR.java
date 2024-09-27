@@ -58,9 +58,9 @@ public class ReactorSMR extends BlockDummyable {
         x += dir.offsetX * o;
         z += dir.offsetZ * o;
 
-        this.makeExtra(world, x + 1, y, z);
-        this.makeExtra(world, x - 1, y, z);
-        this.makeExtra(world, x, y, z + 1);
-        this.makeExtra(world, x, y, z - 1);
+        this.makeExtra(world, x + 1, y, z + 1);
+        this.makeExtra(world, x - 1, y, z + 1);
+        this.makeExtra(world, x + 1, y, z - 1);
+        this.makeExtra(world, x - 1, y, z - 1);
     }
 }

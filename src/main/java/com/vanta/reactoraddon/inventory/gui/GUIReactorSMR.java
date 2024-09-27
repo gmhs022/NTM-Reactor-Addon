@@ -1,6 +1,7 @@
 package com.vanta.reactoraddon.inventory.gui;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -49,7 +50,7 @@ public class GUIReactorSMR extends GuiInfoContainer {
         this.rodField.setEnableBackgroundDrawing(false);
         this.rodField.setMaxStringLength(6);
 
-        this.rodField.setText(String.format(Locale.US, "%.2f", 100 - smr.control));
+        this.rodField.setText(String.format(Locale.US, "%.2f", smr.control));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class GUIReactorSMR extends GuiInfoContainer {
         this.zLevel = 200.0F;
         itemRender.zLevel = 200.0F;
         FontRenderer font = null;
-        if (stack != null) font = stack.getItem()
+        if (stack != null) font = Objects.requireNonNull(stack.getItem())
             .getFontRenderer(stack);
         if (font == null) font = fontRendererObj;
         itemRender.renderItemAndEffectIntoGUI(font, this.mc.getTextureManager(), stack, x, y);
@@ -118,8 +119,8 @@ public class GUIReactorSMR extends GuiInfoContainer {
             17,
             x,
             y,
-            "Temperature:",
-            String.format(Locale.US, "%.2f °C", smr.temp));
+            "Heat:",
+            String.format(Locale.US, "%,d/%,d TU", smr.heat, TileEntityReactorSMR.meltHeat));
         this.drawCustomInfoStat(
             x,
             y,
@@ -141,7 +142,7 @@ public class GUIReactorSMR extends GuiInfoContainer {
             x,
             y,
             "Thermal power:",
-            String.format(Locale.US, "%,d TU/t", smr.thermalOutput));
+            String.format(Locale.US, "%.2e / %,d TU/t", smr.nFlux / 10, smr.thermalOutput));
         this.drawCustomInfoStat(
             x,
             y,
@@ -152,7 +153,18 @@ public class GUIReactorSMR extends GuiInfoContainer {
             x,
             y,
             "Reactivity:",
-            (int) (smr.reactivity * 1e5) + " PCM");
+            (int) (smr.reactivity) + " PCM");
+
+        this.drawCustomInfoStat(
+            x,
+            y,
+            guiLeft + 141,
+            guiTop + 10,
+            6,
+            66,
+            x,
+            y,
+            Math.floor(smr.control * 100) / 100 + "%");
 
         smr.tanks[0].renderTankInfo(this, x, y, guiLeft + 143, guiTop + 98, 16, 52);
         smr.tanks[1].renderTankInfo(this, x, y, guiLeft + 161, guiTop + 98, 16, 52);
@@ -181,7 +193,7 @@ public class GUIReactorSMR extends GuiInfoContainer {
             guiLeft + 169,
             guiTop + 34,
             this.zLevel,
-            smr.temp / TileEntityReactorSMR.meltTemp,
+            ((double) smr.heat) / TileEntityReactorSMR.meltHeat,
             5,
             2,
             1,
@@ -204,15 +216,8 @@ public class GUIReactorSMR extends GuiInfoContainer {
             2,
             1,
             0x202020);
-        GaugeUtil.drawSmoothGauge(
-            guiLeft + 187,
-            guiTop + 67,
-            this.zLevel,
-            (smr.reactivity + 0.01) / 0.02,
-            5,
-            2,
-            1,
-            0x202020);
+        GaugeUtil
+            .drawSmoothGauge(guiLeft + 187, guiTop + 67, this.zLevel, (smr.reactivity + 600) / 1200, 5, 2, 1, 0x202020);
 
         GL11.glDisable(GL11.GL_LIGHTING);
 

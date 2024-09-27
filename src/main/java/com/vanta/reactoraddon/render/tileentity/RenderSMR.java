@@ -47,6 +47,7 @@ public class RenderSMR extends TileEntitySpecialRenderer implements IItemRendere
                 GL11.glScaled(3.5, 3.5, 3.5);
             }
 
+            @Override
             public void renderCommon() {
                 GL11.glScaled(0.5, 0.5, 0.5);
                 GL11.glShadeModel(GL11.GL_SMOOTH);
