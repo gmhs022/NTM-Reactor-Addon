@@ -8,6 +8,7 @@ import com.hbm.handler.GUIHandler;
 import com.vanta.reactoraddon.NTMReactorAddon;
 import com.vanta.reactoraddon.Tags;
 import com.vanta.reactoraddon.blocks.ModBlocks;
+import com.vanta.reactoraddon.hazard.RAHazardRegistry;
 import com.vanta.reactoraddon.inventory.fluid.TraitAdder;
 import com.vanta.reactoraddon.items.ModItems;
 import com.vanta.reactoraddon.tileentity.TileMappings;
@@ -42,6 +43,7 @@ public class CommonProxy {
             else GameRegistry.registerTileEntityWithAlternatives(te.getKey(), te.getValue()[0], te.getValue());
         }
 
+        RAHazardRegistry.register();
         TraitAdder.init();
         NTMReactorAddon.LOG.info(Config.greeting);
         NTMReactorAddon.LOG.info("NTM Reactor Addon loaded. Version " + Tags.VERSION);

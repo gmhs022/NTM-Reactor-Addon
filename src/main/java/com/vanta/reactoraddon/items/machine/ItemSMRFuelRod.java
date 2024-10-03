@@ -23,8 +23,10 @@ public class ItemSMRFuelRod extends Item {
     public double depletionFactor = 1.5D; // *rodReactivity
     public double iodineRate = 1e-5; // per neutron flux
     public double emissionRate = 0.0D;
-    public double tempCoef = 0.00075; // pcm per HU
+    public double tempCoef = 0.0005; // pcm per HU
     public double yield = 1.0D;
+
+    public Item transmutatesTo;
 
     public ItemSMRFuelRod(String fullName, double rodReactivity) {
         this.fullName = fullName;
@@ -57,6 +59,11 @@ public class ItemSMRFuelRod extends Item {
         if (this.emissionRate > 0) {
             list.add(EnumChatFormatting.GOLD + String.format(Locale.US, "Source Flux: %.2e", this.emissionRate));
         }
+    }
+
+    public ItemSMRFuelRod setTransmutate(Item transmutatesTo) {
+        this.transmutatesTo = transmutatesTo;
+        return this;
     }
 
     public ItemSMRFuelRod setDepletionFactor(double depletion) {
@@ -140,46 +147,72 @@ public class ItemSMRFuelRod extends Item {
     public static ItemSMRFuelRod meu235;
     public static ItemSMRFuelRod heu235;
 
+    public static ItemSMRFuelRod th232breeder;
+    public static ItemSMRFuelRod th232fuel;
+
     public static ItemSMRFuelRod undefined;
 
     public static ItemSMRFuelRod soup;
 
     public static void init() {
         ueu235 = (ItemSMRFuelRod) new ItemSMRFuelRod("Unenriched Uranium", 25).setDepletionFactor(1.0)
+            .setTempCoef(0.00085D)
             .setEmissionRate(1e-5)
             .setYield(2.0D)
             .setUnlocalizedName("smr_fuel_ueu235")
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_ueu235");
         meu235 = (ItemSMRFuelRod) new ItemSMRFuelRod("Reactor-Grade Uranium", 50).setDepletionFactor(2.0)
+            .setTempCoef(0.0005D)
             .setEmissionRate(5e-5)
             .setYield(1.0D)
             .setUnlocalizedName("smr_fuel_meu235")
-            .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_ueu235");
+            .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_meu235");
         heu235 = (ItemSMRFuelRod) new ItemSMRFuelRod("Weapons-Grade Uranium", 125).setDepletionFactor(4.0)
+            .setTempCoef(0.00035D)
             .setEmissionRate(5e-4)
             .setYield(0.5D)
             .setUnlocalizedName("smr_fuel_heu235")
-            .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_ueu235");
+            .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_heu235");
+        th232breeder = (ItemSMRFuelRod) new ItemSMRFuelRod("Non-fissile Thorium-232 rod, breeds into usable fuel", -25)
+            .setDepletionFactor(3.0D)
+            .setTempCoef(0.0001D)
+            .setYield(0.25D)
+            .setTransmutate(th232fuel)
+            .setUnlocalizedName("smr_breeder_th232")
+            .setTextureName(NTMReactorAddon.MODID + ":machine/smr_breeder_th232");
+        th232fuel = (ItemSMRFuelRod) new ItemSMRFuelRod("Thorium-232 with MEU-233 driver", 50).setDepletionFactor(1.0D)
+            .setTempCoef(0.0005D)
+            .setEmissionRate(5e-5)
+            .setYield(1.5D)
+            .setUnlocalizedName("smr_fuel_th232")
+            .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_th232");
         undefined = (ItemSMRFuelRod) new ItemSMRFuelRod("Undefined", 500).setDepletionFactor(-3.0)
-            .setTempCoef(-0.02)
+            .setTempCoef(-0.005)
             .setEmissionRate(1.337D)
             .setYield(400.0D)
             .setIodineRate(1e-2)
             .setUnlocalizedName("smr_fuel_undefined")
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_error");
-        soup = (ItemSMRFuelRod) new ItemSMRFuelRod("Now with extra zirconium cladding!", -125).setDepletionFactor(0)
+        soup = (ItemSMRFuelRod) new ItemSMRFuelRod("Now with extra zirconium cladding!", -80).setDepletionFactor(-0.25)
             .setTempCoef(0)
-            .setYield(0.25D)
+            .setYield(0.01D)
             .setIodineRate(0)
+            .setTransmutate(ModItems.smr_chicken_soup)
             .setUnlocalizedName("smr_fuel_soup")
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_chicken_soup");
     }
 
     public static void register() {
-        GameRegistry.registerItem(ueu235, ueu235.getUnlocalizedName());
-        GameRegistry.registerItem(meu235, meu235.getUnlocalizedName());
-        GameRegistry.registerItem(heu235, heu235.getUnlocalizedName());
-        GameRegistry.registerItem(undefined, undefined.getUnlocalizedName());
-        GameRegistry.registerItem(soup, soup.getUnlocalizedName());
+        registerItem(ueu235);
+        registerItem(meu235);
+        registerItem(heu235);
+        registerItem(th232breeder);
+        registerItem(th232fuel);
+        registerItem(undefined);
+        registerItem(soup);
+    }
+
+    private static void registerItem(Item item) {
+        GameRegistry.registerItem(item, item.getUnlocalizedName());
     }
 }

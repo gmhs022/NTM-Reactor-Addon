@@ -4,11 +4,13 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.explosion.ExplosionLarge;
 import com.hbm.explosion.ExplosionNukeGeneric;
 import com.hbm.interfaces.IControlReceiver;
@@ -57,11 +59,17 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
     public double totalFuelReactivity;
     public double emission;
 
+    public double extraReact;
+
     public static final int meltHeat = 10_000_000;
 
     public static final int burstPres = 200;
 
     public static final int maxThermalPower = 2_000_000; // used for the gui and crap, not an actual limit
+
+    public static double depletionRate = 5e-12;
+
+    public static double decayHeatFactor = 5e2D;
 
     public FluidTank[] tanks;
 
@@ -95,13 +103,16 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
 
         return r + this.totalFuelReactivity * modFactor
             + this.cRodCoef * (this.control / 100)
-            + this.tempCoef * (this.heat);
+            + this.tempCoef * (this.heat)
+            + extraReact;
     }
 
     private void meltdown() {
         worldObj.setBlockToAir(this.xCoord, this.yCoord, this.zCoord);
         worldObj.playSoundEffect(xCoord, yCoord + 3, zCoord, "hbm:block.rbmk_explosion", 10.0F, 1.0F);
         worldObj.createExplosion(null, this.xCoord, this.yCoord + 3, this.zCoord, 12F, true);
+        ExplosionLarge
+            .spawnParticles(worldObj, this.xCoord, this.yCoord, this.zCoord, ExplosionLarge.cloudFunction(12));
         ExplosionNukeGeneric.waste(worldObj, this.xCoord, this.yCoord, this.zCoord, 35);
     }
 
@@ -109,15 +120,28 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
         worldObj.setBlockToAir(this.xCoord, this.yCoord, this.zCoord);
         worldObj.playSoundEffect(xCoord, yCoord + 3, zCoord, "hbm:block.rbmk_explosion", 25.0F, 0.8F);
         ExplosionLarge.explode(worldObj, this.xCoord, this.yCoord, this.zCoord, 50F, true, false, true);
+        ExplosionLarge
+            .spawnParticles(worldObj, this.xCoord, this.yCoord, this.zCoord, ExplosionLarge.cloudFunction(50));
         ExplosionNukeGeneric.waste(worldObj, this.xCoord, this.yCoord, this.zCoord, 50);
+    }
+
+    private void detonate() {
+        worldObj.setBlockToAir(this.xCoord, this.yCoord, this.zCoord);
+        worldObj.playSoundEffect(xCoord, yCoord + 3, zCoord, "hbm:block.rbmk_explosion", 25.0F, 0.8F);
+        worldObj
+            .spawnEntityInWorld(EntityNukeExplosionMK5.statFac(worldObj, 15, this.xCoord, this.yCoord, this.zCoord));
+        ExplosionLarge
+            .spawnParticles(worldObj, this.xCoord, this.yCoord, this.zCoord, ExplosionLarge.cloudFunction(50));
     }
 
     private boolean checkFail() {
         if (this.pressure > burstPres) {
             rupture();
+            NTMReactorAddon.LOG.info("SMR at {}, {} ruptured due to pressure!", this.xCoord, this.zCoord);
             return true;
         } else if (this.heat > meltHeat) {
             meltdown();
+            NTMReactorAddon.LOG.info("SMR at {}, {} melted down!", this.xCoord, this.zCoord);
             return true;
         } else return false;
     }
@@ -140,7 +164,6 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
             boolean transferred = this.tanks[0].setType(this.getSizeInventory() - 1, slots);
             if (transferred) {
                 handleTanks();
-                NTMReactorAddon.LOG.info("Transferred PWR fluid type.");
             }
 
             if (this.control != this.controlTgt) {
@@ -158,6 +181,14 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
             recalcSlots();
 
             double r = getReactivity();
+            if (r > 600) r += Math.pow((r - 600) / 12, 2); // prompt critical babeee
+
+            if (r >= 1e5) {
+                detonate();
+                NTMReactorAddon.LOG.info("SMR at {}, {} prompt-detonated!", this.xCoord, this.zCoord);
+                return;
+            }
+
             this.reactivity = r;
             double rawK = 1 / (1 - r / 1e5);
 
@@ -165,10 +196,16 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
                 this.nFlux = this.nFlux * rawK;
             }
             this.nFlux += emission;
+            if (this.fuelCount == 0) {
+                this.nFlux = 0;
+                if (this.heat > 0) this.heat -= Math.min(this.heat, 1000);
+            } else if (this.tanks[0].getFill() <= 0) {
+                this.heat += (int) Math.ceil(this.nFlux * decayHeatFactor);
+            }
 
             this.thermalOutput = (int) nFlux / 10;
 
-            if (this.heat > 0) this.heat++;
+            if (this.heat > 0) this.heat--;
             this.heat += this.thermalOutput;
 
             runCoolant();
@@ -221,6 +258,7 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
         this.graphiteCount = 0;
         this.fuelCount = 0;
         this.emptySlots = 0;
+        this.extraReact = 0;
         for (int i = 0; i < this.getSizeInventory() - 3; i++) {
             if (slots[i] != null) {
                 Item item = slots[i].getItem();
@@ -240,6 +278,8 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
                         this.graphiteRods++;
                     } else if (item == ModItems.smr_graphite_insert) {
                         this.graphiteCount++;
+                    } else if (item == ModItems.smr_chicken_soup) {
+                        this.extraReact -= 100;
                     }
                 } else {
                     this.emptySlots++;
@@ -251,8 +291,6 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
         if (this.fuelCount > 0) this.tempCoef /= this.fuelCount;
     }
 
-    public static double depletionRate = 1e-12;
-
     private void updateSlots() {
         for (int i = 0; i < this.getSizeInventory() - 3; i++) {
             if (slots[i] != null) {
@@ -262,10 +300,14 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
                         ItemSMRFuelRod rod = ((ItemSMRFuelRod) item);
                         double depl = ItemSMRFuelRod.getDepletion(slots[i]);
                         if (depl < 1) {
-                            ItemSMRFuelRod.setDepletion(
+                            double newDepl = Math
+                                .min(depl + (this.nFlux * depletionRate) / (this.fuelCount * rod.yield), 1);
+                            ItemSMRFuelRod.setDepletion(slots[i], newDepl);
+                            ItemSMRFuelRod.setReactivity(
                                 slots[i],
-                                Math.min(depl + (this.nFlux * depletionRate) / (this.fuelCount * rod.yield), 1));
-                        }
+                                rod.rodReactivity - rod.rodReactivity * rod.depletionFactor * newDepl
+                                    - ItemSMRFuelRod.getXenon(slots[i]));
+                        } else if (rod.transmutatesTo != null) slots[i] = new ItemStack(rod.transmutatesTo);
                     }
                 }
             }
@@ -284,12 +326,17 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
                     trait.getEfficiency(FT_Heatable.HeatingType.HEATEXCHANGER),
                     trait.getEfficiency(FT_Heatable.HeatingType.PWR)));
             if (efficiency > 0) {
-                tanks[1].setTankType(trait.getFirstStep().typeProduced);
+                FT_Heatable.HeatingStep step = trait.getFirstStep();
+                tanks[0].changeTankSize(16_000 * step.amountReq);
+                tanks[1].setTankType(step.typeProduced);
+                tanks[1].changeTankSize(16_000 * step.amountProduced);
                 return;
             }
         }
         tanks[0].setTankType(Fluids.NONE);
+        tanks[0].changeTankSize(16_000);
         tanks[1].setTankType(Fluids.NONE);
+        tanks[1].changeTankSize(16_000);
     }
 
     @Override

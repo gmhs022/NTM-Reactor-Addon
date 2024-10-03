@@ -7,6 +7,7 @@ import net.minecraftforge.client.IItemRenderer;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.blocks.BlockDummyable;
 import com.hbm.render.item.ItemRenderBase;
 import com.hbm.render.tileentity.IItemRendererProvider;
 import com.vanta.reactoraddon.blocks.ModBlocks;
@@ -20,6 +21,22 @@ public class RenderSMR extends TileEntitySpecialRenderer implements IItemRendere
         GL11.glTranslated(x + 0.5D, y, z + 0.5D);
         GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_CULL_FACE);
+
+        switch (tileEntity.getBlockMetadata() - BlockDummyable.offset) {
+            case 2:
+                GL11.glRotatef(270, 0F, 1F, 0F);
+                break;
+            case 4:
+                GL11.glRotatef(0, 0F, 1F, 0F);
+                break;
+            case 3:
+                GL11.glRotatef(90, 0F, 1F, 0F);
+                break;
+            case 5:
+                GL11.glRotatef(180, 0F, 1F, 0F);
+                break;
+        }
+
         GL11.glShadeModel(GL11.GL_SMOOTH);
 
         bindTexture(ResourceManager.smr_tex);
