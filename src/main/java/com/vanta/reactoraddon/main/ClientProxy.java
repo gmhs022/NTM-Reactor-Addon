@@ -5,7 +5,9 @@ import net.minecraft.item.Item;
 import net.minecraftforge.client.MinecraftForgeClient;
 
 import com.hbm.render.tileentity.IItemRendererProvider;
+import com.vanta.reactoraddon.render.tileentity.RenderDMRCore;
 import com.vanta.reactoraddon.render.tileentity.RenderSMR;
+import com.vanta.reactoraddon.tileentity.machine.TileEntityReactorDMRCore;
 import com.vanta.reactoraddon.tileentity.machine.TileEntityReactorSMR;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
@@ -21,6 +23,7 @@ public class ClientProxy extends CommonProxy {
         super.preInit(event);
 
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityReactorSMR.class, new RenderSMR());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityReactorDMRCore.class, new RenderDMRCore());
 
         registerItemRenderer();
     }

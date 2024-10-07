@@ -11,10 +11,15 @@ public class ResourceManager {
     // models
     public static final IModelCustom smr = new HFRWavefrontObject(
         new ResourceLocation(NTMReactorAddon.MODID, "models/SMR.obj"));
+    public static final IModelCustom dmr = new HFRWavefrontObject(
+        new ResourceLocation(NTMReactorAddon.MODID, "models/DMRCore.obj"));
 
     // textures
     public static final ResourceLocation smr_tex = new ResourceLocation(
         NTMReactorAddon.MODID,
         "textures/models/ModelSMR.png");
+    public static final ResourceLocation dmr_tex = new ResourceLocation(
+        NTMReactorAddon.MODID,
+        "textures/models/ModelDMRCore.png");
 
 }

@@ -174,8 +174,6 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
                 }
             }
 
-            double prevFlux = this.nFlux;
-
             tanks[0].loadTank(this.getSizeInventory() - 3, this.getSizeInventory() - 2, slots);
 
             recalcSlots();
@@ -209,8 +207,6 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
             this.heat += this.thermalOutput;
 
             runCoolant();
-
-            double realK = nFlux / prevFlux;
 
             updateSlots();
 
