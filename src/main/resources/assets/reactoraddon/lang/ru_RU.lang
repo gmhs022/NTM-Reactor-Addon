@@ -1,0 +1,22 @@
+// Made by OsmoKitty //
+
+// Reactors //
+container.smr=Малый модульный реактор (SMR)
+tile.machine_smr.name=SMR
+
+// Rods //
+item.smr_fuel_empty.name=Пустой топливный стержень SMR
+item.smr_fuel_ueu235.name=Необогащенный урановый топливный стержень SMR
+item.smr_fuel_meu235.name=Среднеобогащенный урановый топливный стержень SMR
+item.smr_fuel_heu235.name=Высокообогащенный урановый-235 топливный стержень SMR
+item.smr_breeder_th232.name=Торий-232 стержень SMR
+item.smr_fuel_th232.name=Ториевый топливный стержень SMR
+item.smr_control_boron.name=Регулирующий стержень SMR
+item.smr_control_boron.desc=Снижает реактивность при введении стержня.
+item.smr_control_graphite.name=Замедляющий регулирующий стержень SMR
+item.smr_control_graphite.desc=Снижает реактивность и замедление при введении стержня, повышает замедление при извлечении.$Обеспечивает дополнительный импульс для реакторов с низкой реактивностью.
+item.smr_graphite_insert.name=Графитовый замедлительный стержень SMR
+item.smr_graphite_insert.desc=Замедляет нейтроны с помощью графита.$Намного эффективнее замедлителей на основе жидкости, но может создать положительный коэффициент пустотности при чрезмерном использовании.
+item.smr_fuel_soup.name=Неприготовленный концентрированный куриный суп с лапшой Campbell's™
+item.smr_chicken_soup.name=Приготовленный концентрированный куриный суп с лапшой Campbell's™
+item.smr_chicken_soup.desc=Только умеренно радиоактивный!
