@@ -11,12 +11,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
-import com.hbm.explosion.ExplosionLarge;
 import com.hbm.explosion.ExplosionNukeGeneric;
+import com.hbm.handler.CompatHandler;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.fluid.trait.FT_Heatable;
+import com.hbm.particle.helper.ExplosionCreator;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
 import com.hbm.util.fauxpointtwelve.DirPos;
@@ -29,12 +30,17 @@ import com.vanta.reactoraddon.items.machine.ItemSMRFuelRod;
 
 import api.hbm.fluid.IFluidStandardTransceiver;
 import api.hbm.tile.IInfoProviderEC;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
+import li.cil.oc.api.machine.Arguments;
+import li.cil.oc.api.machine.Callback;
+import li.cil.oc.api.machine.Context;
 
+@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers") // time for funni
 public class TileEntityReactorSMR extends TileEntityMachineBase
-    implements IControlReceiver, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC {
+    implements IControlReceiver, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC, CompatHandler.OCComponent {
 
     public int heat; // TU
     public double pressure;// bar
@@ -82,7 +88,7 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
         this.tanks[1] = new FluidTank(Fluids.COOLANT_HOT, 32_000);
     }
 
-    private double getReactivity() { // in pcm
+    private double calcReactivity() { // in pcm
         double mod = 0;
         if (this.graphiteRods > 0) {
             double rodMod = 1 - Math.pow(1.25 * this.control / 100 - 1, 2);
@@ -111,17 +117,15 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
         worldObj.setBlockToAir(this.xCoord, this.yCoord, this.zCoord);
         worldObj.playSoundEffect(xCoord, yCoord + 3, zCoord, "hbm:block.rbmk_explosion", 10.0F, 1.0F);
         worldObj.createExplosion(null, this.xCoord, this.yCoord + 3, this.zCoord, 12F, true);
-        ExplosionLarge
-            .spawnParticles(worldObj, this.xCoord, this.yCoord, this.zCoord, ExplosionLarge.cloudFunction(12));
+        ExplosionCreator.composeEffectStandard(worldObj, this.xCoord, this.yCoord, this.zCoord);
         ExplosionNukeGeneric.waste(worldObj, this.xCoord, this.yCoord, this.zCoord, 35);
     }
 
     private void rupture() {
         worldObj.setBlockToAir(this.xCoord, this.yCoord, this.zCoord);
         worldObj.playSoundEffect(xCoord, yCoord + 3, zCoord, "hbm:block.rbmk_explosion", 25.0F, 0.8F);
-        ExplosionLarge.explode(worldObj, this.xCoord, this.yCoord, this.zCoord, 50F, true, false, true);
-        ExplosionLarge
-            .spawnParticles(worldObj, this.xCoord, this.yCoord, this.zCoord, ExplosionLarge.cloudFunction(50));
+        worldObj.createExplosion(null, this.xCoord, this.yCoord + 3, this.zCoord, 50F, true);
+        ExplosionCreator.composeEffectLarge(worldObj, this.xCoord, this.yCoord, this.zCoord);
         ExplosionNukeGeneric.waste(worldObj, this.xCoord, this.yCoord, this.zCoord, 50);
     }
 
@@ -130,8 +134,7 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
         worldObj.playSoundEffect(xCoord, yCoord + 3, zCoord, "hbm:block.rbmk_explosion", 25.0F, 0.8F);
         worldObj
             .spawnEntityInWorld(EntityNukeExplosionMK5.statFac(worldObj, 15, this.xCoord, this.yCoord, this.zCoord));
-        ExplosionLarge
-            .spawnParticles(worldObj, this.xCoord, this.yCoord, this.zCoord, ExplosionLarge.cloudFunction(50));
+        ExplosionCreator.composeEffectLarge(worldObj, this.xCoord, this.yCoord, this.zCoord);
     }
 
     private boolean checkFail() {
@@ -178,7 +181,7 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
 
             recalcSlots();
 
-            double r = getReactivity();
+            double r = calcReactivity();
             if (r > 600) r += Math.pow((r - 600) / 12, 2); // prompt critical babeee
 
             if (r >= 1e5) {
@@ -472,4 +475,86 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
     public void provideExtraInfo(NBTTagCompound data) {
 
     }
+
+    // OPENCOMPUTERS !!
+    @Override
+    @Optional.Method(modid = "OpenComputers")
+    public String getComponentName() {
+        return "ntm_ra_smr";
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getHeat(Context context, Arguments args) {
+        return new Object[] { heat };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getPressure(Context context, Arguments args) {
+        return new Object[] { pressure };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getNFlux(Context context, Arguments args) {
+        return new Object[] { nFlux };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getThermalOutput(Context context, Arguments args) {
+        return new Object[] { thermalOutput };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getReactivity(Context context, Arguments args) {
+        return new Object[] { reactivity };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getFuelReactivity(Context context, Arguments args) {
+        return new Object[] { totalFuelReactivity };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getControlCount(Context context, Arguments args) {
+        return new Object[] { crCount };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getTempCoef(Context context, Arguments args) {
+        return new Object[] { tempCoef };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getSourceRate(Context context, Arguments args) {
+        return new Object[] { emission };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getControlLevel(Context context, Arguments args) {
+        return new Object[] { control };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] getControlTgt(Context context, Arguments args) {
+        return new Object[] { controlTgt };
+    }
+
+    @Callback(direct = true)
+    @Optional.Method(modid = "OpenComputers")
+    public Object[] setControlTgt(Context context, Arguments args) {
+        controlTgt = (float) Math.min(Math.max(args.checkDouble(0), 0F), 100F);
+        this.markChanged();
+        return new Object[] { true };
+    }
+
 }

@@ -13,6 +13,7 @@ import com.vanta.reactoraddon.tileentity.machine.TileEntityReactorSMR;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
+@SuppressWarnings("unused")
 public class ClientProxy extends CommonProxy {
 
     // Override CommonProxy methods here, if you want a different behaviour on the client (e.g. registering renders).
