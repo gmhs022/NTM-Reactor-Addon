@@ -37,10 +37,11 @@ import io.netty.buffer.ByteBuf;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
+import li.cil.oc.api.network.SimpleComponent;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers") // time for funni
-public class TileEntityReactorSMR extends TileEntityMachineBase
-    implements IControlReceiver, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC, CompatHandler.OCComponent {
+public class TileEntityReactorSMR extends TileEntityMachineBase implements IControlReceiver, IFluidStandardTransceiver,
+    IGUIProvider, IInfoProviderEC, SimpleComponent, CompatHandler.OCComponent {
 
     public int heat; // TU
     public double pressure;// bar
