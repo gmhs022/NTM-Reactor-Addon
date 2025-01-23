@@ -12,7 +12,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.explosion.ExplosionNukeGeneric;
-import com.hbm.handler.CompatHandler;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
@@ -40,8 +39,8 @@ import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers") // time for funni
-public class TileEntityReactorSMR extends TileEntityMachineBase implements IControlReceiver, IFluidStandardTransceiver,
-    IGUIProvider, IInfoProviderEC, SimpleComponent, CompatHandler.OCComponent {
+public class TileEntityReactorSMR extends TileEntityMachineBase
+    implements IControlReceiver, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC, SimpleComponent {
 
     public int heat; // TU
     public double pressure;// bar
