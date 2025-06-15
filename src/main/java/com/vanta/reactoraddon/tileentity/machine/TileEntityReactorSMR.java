@@ -73,7 +73,7 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
 
     public static final int maxThermalPower = 2_000_000; // used for the gui and crap, not an actual limit
 
-    public static double depletionRate = 5e-12;
+    public static double depletionRate = 1e-11;
 
     public static double decayHeatFactor = 5e2D;
 
@@ -440,7 +440,7 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
         if (bb == null) {
-            bb = AxisAlignedBB.getBoundingBox(xCoord - 1, yCoord, zCoord - 1, xCoord + 1, yCoord + 7, zCoord + 1);
+            bb = AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 2, yCoord + 8, zCoord + 2);
         }
         return bb;
     }
@@ -483,73 +483,73 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
         return "ntm_ra_smr";
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; Returns the reactor's current heat level in HU")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getHeat(Context context, Arguments args) {
         return new Object[] { heat };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; TODO: NYI")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getPressure(Context context, Arguments args) {
         return new Object[] { pressure };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; Returns the reactor's current neutron flux level")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getNFlux(Context context, Arguments args) {
         return new Object[] { nFlux };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; Returns the reactor's current thermal output in TU/t")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getThermalOutput(Context context, Arguments args) {
         return new Object[] { thermalOutput };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; Returns the reactor's current reactivity in PCM")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getReactivity(Context context, Arguments args) {
         return new Object[] { reactivity };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; Returns the reactor's maximum reactivity from fuel")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getFuelReactivity(Context context, Arguments args) {
         return new Object[] { totalFuelReactivity };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; Returns the reactor's control rod item count")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getControlCount(Context context, Arguments args) {
         return new Object[] { crCount };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; Returns the reactor's temperature coefficient in PCM/HU")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getTempCoef(Context context, Arguments args) {
         return new Object[] { tempCoef };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; Returns the reactor's source rate in NFlux/t")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getSourceRate(Context context, Arguments args) {
         return new Object[] { emission };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; Returns the reactor's current control rod level")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getControlLevel(Context context, Arguments args) {
         return new Object[] { control };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function():number; Returns the reactor's current control rod target")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getControlTgt(Context context, Arguments args) {
         return new Object[] { controlTgt };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function(tgt:number); Sets the control rod target, clamped to 0-100")
     @Optional.Method(modid = "OpenComputers")
     public Object[] setControlTgt(Context context, Arguments args) {
         controlTgt = (float) Math.min(Math.max(args.checkDouble(0), 0F), 100F);

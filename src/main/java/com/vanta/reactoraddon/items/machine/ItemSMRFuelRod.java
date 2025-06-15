@@ -25,6 +25,7 @@ public class ItemSMRFuelRod extends Item {
     public double emissionRate = 0.0D;
     public double tempCoef = 0.0005; // pcm per HU
     public double yield = 1.0D;
+    public float moderation = 0.0F;
 
     public Item transmutatesTo;
 
@@ -51,6 +52,9 @@ public class ItemSMRFuelRod extends Item {
         list.add(
             EnumChatFormatting.GREEN + String.format(Locale.US, "Yield: %d", (int) Math.floor(this.yield * 100)) + "%");
         list.add(EnumChatFormatting.YELLOW + "Reactivity: " + Math.floor(getReactivity(stack) * 100) / 100 + " PCM");
+        if (this.moderation > 0) {
+            list.add(EnumChatFormatting.BLUE + String.format(Locale.US, "%.01f Insert Equivalent", this.moderation));
+        }
         list.add(
             EnumChatFormatting.YELLOW + "Temp Coefficient: " + Math.floor(this.tempCoef * -1e5) / 100 + " PCM/kHU");
         list.add(
@@ -91,6 +95,16 @@ public class ItemSMRFuelRod extends Item {
         return this;
     }
 
+    public static double getXenon(ItemStack stack) {
+        if (!stack.hasTagCompound()) setNBTDefaults(stack);
+        return stack.stackTagCompound.getDouble("xenon");
+    }
+
+    public ItemSMRFuelRod setModeration(float moderation) {
+        this.moderation = moderation;
+        return this;
+    }
+
     public static void setReactivity(ItemStack stack, double depletion) {
         if (!stack.hasTagCompound()) setNBTDefaults(stack);
         stack.stackTagCompound.setDouble("reactivity", depletion);
@@ -109,7 +123,6 @@ public class ItemSMRFuelRod extends Item {
 
     public static double getDepletion(ItemStack stack) {
         if (!stack.hasTagCompound()) setNBTDefaults(stack);
-
         return stack.stackTagCompound.getDouble("depletion");
     }
 
@@ -120,19 +133,12 @@ public class ItemSMRFuelRod extends Item {
 
     public static double getIodine(ItemStack stack) {
         if (!stack.hasTagCompound()) setNBTDefaults(stack);
-
         return stack.stackTagCompound.getDouble("iodine");
     }
 
     public static void setXenon(ItemStack stack, double depletion) {
         if (!stack.hasTagCompound()) setNBTDefaults(stack);
         stack.stackTagCompound.setDouble("xenon", depletion);
-    }
-
-    public static double getXenon(ItemStack stack) {
-        if (!stack.hasTagCompound()) setNBTDefaults(stack);
-
-        return stack.stackTagCompound.getDouble("xenon");
     }
 
     private static void setNBTDefaults(ItemStack stack) {
@@ -156,38 +162,38 @@ public class ItemSMRFuelRod extends Item {
 
     public static void init() {
         ueu235 = (ItemSMRFuelRod) new ItemSMRFuelRod("Unenriched Uranium", 25).setDepletionFactor(1.0)
-            .setTempCoef(0.00085D)
+            .setTempCoef(0.75e-3D)
             .setEmissionRate(1e-5)
             .setYield(2.0D)
             .setUnlocalizedName("smr_fuel_ueu235")
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_ueu235");
         meu235 = (ItemSMRFuelRod) new ItemSMRFuelRod("Reactor-Grade Uranium", 50).setDepletionFactor(2.0)
-            .setTempCoef(0.0005D)
+            .setTempCoef(0.5e-3D)
             .setEmissionRate(5e-5)
             .setYield(1.0D)
             .setUnlocalizedName("smr_fuel_meu235")
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_meu235");
         heu235 = (ItemSMRFuelRod) new ItemSMRFuelRod("Weapons-Grade Uranium", 125).setDepletionFactor(4.0)
-            .setTempCoef(0.00035D)
+            .setTempCoef(0.25e-3D)
             .setEmissionRate(5e-4)
             .setYield(0.5D)
             .setUnlocalizedName("smr_fuel_heu235")
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_heu235");
         th232breeder = (ItemSMRFuelRod) new ItemSMRFuelRod("Non-fissile Thorium-232 rod, breeds into usable fuel", -25)
             .setDepletionFactor(3.0D)
-            .setTempCoef(0.0001D)
+            .setTempCoef(0.1e-3D)
             .setYield(0.25D)
             .setTransmutate(th232fuel)
             .setUnlocalizedName("smr_breeder_th232")
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_breeder_th232");
         th232fuel = (ItemSMRFuelRod) new ItemSMRFuelRod("Thorium-232 with MEU-233 driver", 50).setDepletionFactor(1.0D)
-            .setTempCoef(0.0005D)
+            .setTempCoef(0.5e-3D)
             .setEmissionRate(5e-5)
             .setYield(1.5D)
             .setUnlocalizedName("smr_fuel_th232")
             .setTextureName(NTMReactorAddon.MODID + ":machine/smr_fuel_th232");
         undefined = (ItemSMRFuelRod) new ItemSMRFuelRod("Undefined", 500).setDepletionFactor(-3.0)
-            .setTempCoef(-0.005)
+            .setTempCoef(-5e-3D)
             .setEmissionRate(1.337D)
             .setYield(400.0D)
             .setIodineRate(1e-2)

@@ -12,12 +12,13 @@ public class TraitAdder {
     }
 
     public static void init() {
-        SMRCoolant(Fluids.WATER, -400, 1);
-        SMRCoolant(Fluids.COOLANT, -200, 2);
-        SMRCoolant(Fluids.MUG, -250, 6);
+        SMRCoolant(Fluids.WATER, -300, 1);
+        SMRCoolant(Fluids.COOLANT, -100, 2);
+        SMRCoolant(Fluids.MUG, -200, 6);
         SMRCoolant(Fluids.HEAVYWATER, -300, 14);
         SMRCoolant(Fluids.BLOOD, -300, 8);
-        SMRCoolant(Fluids.SODIUM, -50, 0);
+        SMRCoolant(Fluids.SODIUM, 0, 0);
+        SMRCoolant(Fluids.PERFLUOROMETHYL, -100, 2);
     }
 
     private static void SMRCoolant(FluidType fluid, double reactivity, double ModerationFactor) {
