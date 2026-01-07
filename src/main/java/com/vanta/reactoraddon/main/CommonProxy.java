@@ -3,6 +3,7 @@ package com.vanta.reactoraddon.main;
 import java.util.Map;
 
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.MinecraftForge;
 
 import com.hbm.handler.GUIHandler;
 import com.vanta.reactoraddon.NTMReactorAddon;
@@ -13,6 +14,7 @@ import com.vanta.reactoraddon.inventory.fluid.TraitAdder;
 import com.vanta.reactoraddon.items.ModItems;
 import com.vanta.reactoraddon.tileentity.TileMappings;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -47,6 +49,13 @@ public class CommonProxy {
         TraitAdder.init();
         NTMReactorAddon.LOG.info(Config.greeting);
         NTMReactorAddon.LOG.info("NTM Reactor Addon loaded. Version " + Tags.VERSION);
+    }
+
+    private void registerEventHandler(Object handler) {
+        MinecraftForge.EVENT_BUS.register(handler);
+        FMLCommonHandler.instance()
+            .bus()
+            .register(handler);
     }
 
     // load "Do your mod setup. Build whatever data structures you care about. Register recipes." (Remove if not needed)

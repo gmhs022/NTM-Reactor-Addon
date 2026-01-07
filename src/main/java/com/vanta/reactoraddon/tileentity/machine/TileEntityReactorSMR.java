@@ -27,7 +27,7 @@ import com.vanta.reactoraddon.inventory.gui.GUIReactorSMR;
 import com.vanta.reactoraddon.items.ModItems;
 import com.vanta.reactoraddon.items.machine.ItemSMRFuelRod;
 
-import api.hbm.fluid.IFluidStandardTransceiver;
+import api.hbm.fluidmk2.IFluidStandardTransceiverMK2;
 import api.hbm.tile.IInfoProviderEC;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
@@ -40,7 +40,7 @@ import li.cil.oc.api.network.SimpleComponent;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers") // time for funni
 public class TileEntityReactorSMR extends TileEntityMachineBase
-    implements IControlReceiver, IFluidStandardTransceiver, IGUIProvider, IInfoProviderEC, SimpleComponent {
+    implements IControlReceiver, IFluidStandardTransceiverMK2, IGUIProvider, IInfoProviderEC, SimpleComponent {
 
     public int heat; // TU
     public double pressure;// bar
@@ -214,7 +214,7 @@ public class TileEntityReactorSMR extends TileEntityMachineBase
             updateSlots();
 
             for (DirPos pos : getConPos()) {
-                this.sendFluid(tanks[1], worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
+                this.tryProvide(tanks[1], worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
             }
 
             this.markDirty();

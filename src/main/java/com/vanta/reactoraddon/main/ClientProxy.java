@@ -5,6 +5,8 @@ import net.minecraft.item.Item;
 import net.minecraftforge.client.MinecraftForgeClient;
 
 import com.hbm.render.tileentity.IItemRendererProvider;
+import com.vanta.reactoraddon.event.EventRegistry;
+import com.vanta.reactoraddon.event.client.TooltipEventHandler;
 import com.vanta.reactoraddon.render.tileentity.RenderDMRCore;
 import com.vanta.reactoraddon.render.tileentity.RenderSMR;
 import com.vanta.reactoraddon.tileentity.machine.TileEntityReactorDMRCore;
@@ -27,9 +29,11 @@ public class ClientProxy extends CommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityReactorDMRCore.class, new RenderDMRCore());
 
         registerItemRenderer();
+
+        EventRegistry.registerEventHandler(new TooltipEventHandler());
     }
 
-    public void registerItemRenderer() {
+    private void registerItemRenderer() {
         for (Object renderer : TileEntityRendererDispatcher.instance.mapSpecialRenderers.values()) {
             if (renderer instanceof IItemRendererProvider) {
                 IItemRendererProvider prov = (IItemRendererProvider) renderer;
