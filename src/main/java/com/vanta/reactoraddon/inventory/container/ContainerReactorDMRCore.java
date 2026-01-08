@@ -19,19 +19,30 @@ public class ContainerReactorDMRCore extends Container {
         dmr = tile;
 
         // Particle in/out
-        this.addSlotToContainer(new Slot(tile, 0, 68, 6));
-        this.addSlotToContainer(new SlotTakeOnly(tile, 1, 104, 6));
+        this.addSlotToContainer(new Slot(tile, 0, 104, 6));
+        this.addSlotToContainer(new SlotTakeOnly(tile, 1, 140, 6));
 
         // fuel id
-        this.addSlotToContainer(new Slot(tile, 2, 137, 6));
+        this.addSlotToContainer(new Slot(tile, 2, 55, 104));
 
         // coolant in/out/id
-        this.addSlotToContainer(new Slot(tile, 3, 163, 6));
-        this.addSlotToContainer(new SlotTakeOnly(tile, 4, 181, 6));
-        this.addSlotToContainer(new Slot(tile, 5, 199, 6));
+        this.addSlotToContainer(new Slot(tile, 3, 172, 6));
+        this.addSlotToContainer(new SlotTakeOnly(tile, 4, 190, 6));
+        this.addSlotToContainer(new Slot(tile, 5, 208, 6));
 
         // battery
-        this.addSlotToContainer(new Slot(tile, 6, 8, 101));
+        this.addSlotToContainer(new Slot(tile, 6, 8, 92));
+
+        // player
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 9; j++) {
+                this.addSlotToContainer(new Slot(invPlayer, j + i * 9 + 9, 8 + j * 18 + 26, 84 + i * 18 + 42));
+            }
+        }
+
+        for (int i = 0; i < 9; i++) {
+            this.addSlotToContainer(new Slot(invPlayer, i, 8 + i * 18 + 26, 201));
+        }
 
     }
 

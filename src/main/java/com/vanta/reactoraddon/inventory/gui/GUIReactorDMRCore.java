@@ -3,6 +3,7 @@ package com.vanta.reactoraddon.inventory.gui;
 import java.util.Locale;
 import java.util.Objects;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiTextField;
@@ -30,8 +31,8 @@ public class GUIReactorDMRCore extends GuiInfoContainer {
     public GUIReactorDMRCore(InventoryPlayer invPlayer, TileEntityReactorDMRCore tile) {
         super(new ContainerReactorDMRCore(invPlayer, tile));
         dmr = tile;
-        this.xSize = 256;
-        this.ySize = 256;
+        this.xSize = 229;
+        this.ySize = 225;
     }
 
     @Override
@@ -93,10 +94,23 @@ public class GUIReactorDMRCore extends GuiInfoContainer {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
+
+        dmr.tanks[0].renderTankInfo(this, mouseX, mouseY, guiLeft + 172, guiTop + 24, 16, 52);
+        dmr.tanks[1].renderTankInfo(this, mouseX, mouseY, guiLeft + 190, guiTop + 24, 16, 52);
+        dmr.tanks[2].renderTankInfo(this, mouseX, mouseY, guiLeft + 73, guiTop + 68, 16, 52);
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        Minecraft.getMinecraft()
+            .getTextureManager()
+            .bindTexture(tex);
+        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize - 99); // main gui
+        drawTexturedModalRect(guiLeft + 26, guiTop + 126, 0, 126, 176, 99); // invenetory
 
+        dmr.tanks[0].renderTank(guiLeft + 172, guiTop + 24 + 52, this.zLevel, 16, 52); // coolant in
+        dmr.tanks[1].renderTank(guiLeft + 190, guiTop + 24 + 52, this.zLevel, 16, 52); // coolant out
+        dmr.tanks[2].renderTank(guiLeft + 73, guiTop + 68 + 52, this.zLevel, 16, 52); // fuel
     }
 }

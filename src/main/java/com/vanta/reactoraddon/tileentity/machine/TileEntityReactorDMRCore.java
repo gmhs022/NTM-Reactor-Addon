@@ -5,15 +5,19 @@ import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
+import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.main.MainRegistry;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
+import com.hbm.util.fauxpointtwelve.DirPos;
 import com.vanta.reactoraddon.inventory.container.ContainerReactorDMRCore;
+import com.vanta.reactoraddon.inventory.fluid.trait.FT_DMRFuel;
 import com.vanta.reactoraddon.inventory.gui.GUIReactorDMRCore;
 
 import api.hbm.energymk2.IEnergyReceiverMK2;
@@ -31,7 +35,7 @@ public class TileEntityReactorDMRCore extends TileEntityMachineBase implements I
     IFluidStandardTransceiverMK2, IGUIProvider, IEnergyReceiverMK2, IInfoProviderEC, SimpleComponent {
 
     public static int maxParticles = 12;
-    public static int maxHeat;
+    public static int maxHeat = 1_000_000_000;
 
     public float injRate;
     public double particleLevel;
@@ -39,7 +43,7 @@ public class TileEntityReactorDMRCore extends TileEntityMachineBase implements I
     public int integrity; // %*1000
 
     public float reactionRate; // might just be for sound idk
-    public int melting;
+    public float melting;
 
     public FluidTank[] tanks;
     // 0 = coolant in, 1 = coolant out, 2 = fuel
@@ -64,10 +68,93 @@ public class TileEntityReactorDMRCore extends TileEntityMachineBase implements I
         return "container.dmr";
     }
 
+    private boolean checkFail() {
+        if (melting > 1000) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected void handleCoolTanks() {
+        FT_Heatable trait = tanks[0].getTankType()
+            .getTrait(FT_Heatable.class);
+        if (trait != null) {
+            double efficiency = Math.max(
+                trait.getEfficiency(FT_Heatable.HeatingType.HEATEXCHANGER),
+                trait.getEfficiency(FT_Heatable.HeatingType.ICF));
+            if (efficiency > 0) {
+                FT_Heatable.HeatingStep step = trait.getFirstStep();
+                tanks[0].changeTankSize(32_000 * step.amountReq);
+                tanks[1].setTankType(step.typeProduced);
+                tanks[1].changeTankSize(32_000 * step.amountProduced);
+                return;
+            }
+        }
+        tanks[0].setTankType(Fluids.NONE);
+        tanks[0].changeTankSize(32_000);
+        tanks[1].setTankType(Fluids.NONE);
+        tanks[1].changeTankSize(32_000);
+    }
+
+    protected void handleFuelTank() {
+        FT_DMRFuel trait = tanks[2].getTankType()
+            .getTrait(FT_DMRFuel.class);
+        if (trait == null) {
+            tanks[2].setTankType(Fluids.NONE);
+            tanks[2].changeTankSize(32_000);
+        }
+    }
+
     @Override
     public void updateEntity() {
         if (!worldObj.isRemote) {
 
+            if (checkFail()) return;
+
+            { // coolant in
+                boolean transferred = this.tanks[0].setType(5, slots);
+                if (transferred) {
+                    handleCoolTanks();
+                }
+                tanks[0].loadTank(3, 4, slots);
+
+                for (DirPos pos : getConPos()) {
+                    this.trySubscribe(
+                        tanks[0].getTankType(),
+                        worldObj,
+                        pos.getX(),
+                        pos.getY(),
+                        pos.getZ(),
+                        pos.getDir());
+                }
+            }
+
+            { // fuel
+                boolean transferred = this.tanks[2].setType(2, slots);
+                if (transferred) {
+                    handleFuelTank();
+                }
+
+                for (DirPos pos : getConPos()) {
+                    this.trySubscribe(
+                        tanks[2].getTankType(),
+                        worldObj,
+                        pos.getX(),
+                        pos.getY(),
+                        pos.getZ(),
+                        pos.getDir());
+                }
+            }
+
+            // TODO: SHIT HERE
+
+            for (DirPos pos : getConPos()) {
+                this.tryProvide(tanks[1], worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
+            }
+
+            this.markDirty();
+            this.networkPackNT(150);
         } else {
 
             if (this.reactionRate > 0 && MainRegistry.proxy.me()
@@ -103,7 +190,7 @@ public class TileEntityReactorDMRCore extends TileEntityMachineBase implements I
     @Override
     public void receiveControl(NBTTagCompound data) {
         if (data.hasKey("injRate")) {
-            this.injRate = data.getFloat("injRate");
+            this.injRate = Math.min(Math.max(data.getFloat("injRate"), 0f), 100f);
             this.markChanged();
         }
     }
@@ -113,9 +200,24 @@ public class TileEntityReactorDMRCore extends TileEntityMachineBase implements I
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
         if (bb == null) {
-            bb = AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 2, yCoord + 8, zCoord + 2);
+            bb = AxisAlignedBB.getBoundingBox(xCoord - 4, yCoord - 4, zCoord - 4, xCoord + 4, yCoord + 12, zCoord + 4);
         }
         return bb;
+    }
+
+    private DirPos[] getConPos() {
+        return new DirPos[] { new DirPos(xCoord - 4, yCoord, zCoord - 2, ForgeDirection.WEST),
+            new DirPos(xCoord - 4, yCoord, zCoord, ForgeDirection.WEST),
+            new DirPos(xCoord - 4, yCoord, zCoord + 2, ForgeDirection.WEST),
+            new DirPos(xCoord - 2, yCoord, zCoord - 4, ForgeDirection.NORTH),
+            new DirPos(xCoord, yCoord, zCoord - 4, ForgeDirection.NORTH),
+            new DirPos(xCoord + 2, yCoord, zCoord - 4, ForgeDirection.NORTH),
+            new DirPos(xCoord + 4, yCoord, zCoord - 2, ForgeDirection.EAST),
+            new DirPos(xCoord + 4, yCoord, zCoord, ForgeDirection.EAST),
+            new DirPos(xCoord + 4, yCoord, zCoord + 2, ForgeDirection.EAST),
+            new DirPos(xCoord - 2, yCoord, zCoord + 4, ForgeDirection.SOUTH),
+            new DirPos(xCoord, yCoord, zCoord + 4, ForgeDirection.SOUTH),
+            new DirPos(xCoord + 2, yCoord, zCoord + 4, ForgeDirection.SOUTH), };
     }
 
     @Override
@@ -189,13 +291,13 @@ public class TileEntityReactorDMRCore extends TileEntityMachineBase implements I
         return "ntm_ra_dmr";
     }
 
-    @Callback(direct = true, doc = "function():number; Returns the reactor's current control rod target")
+    @Callback(direct = true, doc = "function():number; Returns the reactor's current injection rate")
     @Optional.Method(modid = "OpenComputers")
     public Object[] getInjectionRate(Context context, Arguments args) {
         return new Object[] { injRate };
     }
 
-    @Callback(direct = true)
+    @Callback(direct = true, doc = "function(rate:number); Sets the reactor's injection rate")
     @Optional.Method(modid = "OpenComputers")
     public Object[] setInjectionRate(Context context, Arguments args) {
         injRate = (float) Math.min(Math.max(args.checkDouble(0), 0F), 100F);
